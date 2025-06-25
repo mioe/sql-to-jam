@@ -1,13 +1,21 @@
 {
 	"compilerOptions": {
 		"target": "ES2022",
-		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+		"jsx": "react",
+		"jsxFactory": "figma.widget.h",
+		"jsxFragmentFactory": "figma.widget.Fragment",
+		"lib": ["ES2022"],
 		"moduleDetection": "force",
 		"useDefineForClassFields": true,
 		"module": "ESNext",
 
 		/* Bundler mode */
 		"moduleResolution": "bundler",
+		"typeRoots": [
+			"../node_modules/@types",
+			"../node_modules/@figma"
+		],
 		"allowImportingTsExtensions": true,
 
 		/* Linting */
