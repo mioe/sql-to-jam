@@ -5,73 +5,82 @@ import { defineConfig } from 'vite'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export default defineConfig({
-	build: {
-		emptyOutDir: true,
+export default defineConfig(({ command, mode }) => {
+	// eslint-disable-next-line no-console
+	console.log('🦕 vite.config.ts/defineConfig', command, mode)
+	const isDev = command === 'build' && mode === 'development'
 
-		rollupOptions: {
-			input: path.resolve(__dirname, 'src/main.tsx'),
-			external: [],
+	return {
+		build: {
+			emptyOutDir: true,
 
-			output: {
-				entryFileNames: 'main.js',
-				format: 'iife',
-				sourcemap: false,
-				inlineDynamicImports: true,
-				manualChunks: undefined,
-				name: 'FigmaWidget',
+			rollupOptions: {
+				input: path.resolve(__dirname, 'src/main.tsx'),
+				external: [],
+
+				output: {
+					entryFileNames: 'main.js',
+					format: 'iife',
+					sourcemap: isDev ? 'inline' : false,
+					inlineDynamicImports: true,
+					manualChunks: undefined,
+					name: 'FigmaWidget',
+				},
 			},
+
+			target: 'es2020',
+			assetsInlineLimit: 100000000,
+			cssCodeSplit: false,
+			minify: isDev ? false : 'esbuild',
+			watch: isDev ? {} : null,
 		},
 
-		target: 'es2020',
-		assetsInlineLimit: 100000000,
-		cssCodeSplit: false,
-	},
-
-	server: {
-		hmr: false,
-		open: false,
-	},
-
-	esbuild: {
-		jsx: 'transform',
-		jsxFactory: 'figma.widget.h',
-		jsxFragment: 'figma.widget.Fragment',
-		target: 'es2020',
-		keepNames: true,
-	},
-
-	resolve: {
-		alias: {
-			'~/': `${path.resolve(__dirname, 'src')}/`,
+		server: {
+			hmr: false,
+			open: false,
 		},
-		extensions: ['.ts', '.tsx', '.js', '.jsx'],
-	},
 
-	css: {
-		modules: false,
-	},
+		esbuild: {
+			jsx: 'transform',
+			jsxFactory: 'figma.widget.h',
+			jsxFragment: 'figma.widget.Fragment',
+			target: 'es2020',
+			keepNames: true,
+		},
 
-	optimizeDeps: {
-		include: [],
-		exclude: ['@figma/widget-typings', '@figma/plugin-typings'],
-	},
+		resolve: {
+			alias: {
+				'~/': `${path.resolve(__dirname, 'src')}/`,
+			},
+			extensions: ['.ts', '.tsx', '.js', '.jsx'],
+		},
 
-	plugins: [
-		{
-			name: 'figma-size-validator',
-			writeBundle(_options, bundle) {
-				const codeFile = bundle['code.js']
-				if (codeFile && codeFile.type === 'chunk') {
-					// eslint-disable-next-line node/prefer-global/buffer
-					const sizeKB = Buffer.byteLength(codeFile.code, 'utf8') / 1024
-					console.warn(`📦 Size widget: ${sizeKB.toFixed(2)} KB`)
+		css: {
+			modules: false,
+		},
 
-					if (sizeKB > 500) {
-						console.warn(`⚠️  Bad size >500 RB`)
+		optimizeDeps: {
+			include: [],
+			exclude: ['@figma/widget-typings', '@figma/plugin-typings'],
+		},
+
+		plugins: [
+			{
+				name: 'figma-size-validator',
+				writeBundle(_options, bundle) {
+					const codeFile = bundle['main.js']
+					if (codeFile && codeFile.type === 'chunk') {
+						// eslint-disable-next-line node/prefer-global/buffer
+						const sizeKB = Buffer.byteLength(codeFile.code, 'utf8') / 1024
+						const timestamp = new Date().toLocaleTimeString()
+						console.warn(`📦 [${timestamp}] Widget rebuilt: ${sizeKB.toFixed(2)} KB`)
+
+						if (sizeKB > 500) {
+							console.warn(`⚠️  Large bundle size: ${sizeKB.toFixed(2)} KB (>500 KB)`)
+						}
 					}
-				}
+				},
 			},
-		},
-	],
+		],
+	}
 })
