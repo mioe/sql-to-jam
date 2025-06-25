@@ -1,7 +1,6 @@
 {
 	"compilerOptions": {
 		"target": "ES2022",
-
 		"jsx": "react",
 		"jsxFactory": "figma.widget.h",
 		"jsxFragmentFactory": "figma.widget.Fragment",
@@ -12,10 +11,6 @@
 
 		/* Bundler mode */
 		"moduleResolution": "bundler",
-		"typeRoots": [
-			"../node_modules/@types",
-			"../node_modules/@figma"
-		],
 		"allowImportingTsExtensions": true,
 
 		/* Linting */
@@ -27,7 +22,19 @@
 		"verbatimModuleSyntax": true,
 		"erasableSyntaxOnly": true,
 		"skipLibCheck": true,
-		"noUncheckedSideEffectImports": true
+		"noUncheckedSideEffectImports": true,
+
+		/* Figma specific */
+		// eslint-disable-next-line jsonc/sort-keys
+		"esModuleInterop": true,
+		// eslint-disable-next-line jsonc/sort-keys
+		"allowSyntheticDefaultImports": true
 	},
-	"include": ["src"]
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }

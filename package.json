@@ -1,5 +1,5 @@
 {
-	"name": "pg-to-jam",
+	"name": "sql-to-jam",
 	"type": "module",
 	"version": "0.0.0",
 	"private": true,
